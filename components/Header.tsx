@@ -3,7 +3,6 @@ import Image from "next/image";
 import { MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Menu, Transition } from "@headlessui/react";
-import { type Session } from "next-auth";
 
 const Header: React.FC = () => {
   return (
