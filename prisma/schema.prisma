@@ -25,6 +25,7 @@ model Todo {
     id     String     @id @default(cuid())
     title  String
     status TodoStatus
+    index  Int
     image  String?
 
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -70,7 +71,10 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    Todo          Todo[]
+    todos         Todo[]
+    first         Int       @default(0)
+    second        Int       @default(1)
+    third         Int       @default(2)
 }
 
 model VerificationToken {

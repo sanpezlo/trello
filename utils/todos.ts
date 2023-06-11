@@ -1,7 +1,12 @@
 import { type Columns, type Column } from "@/types/Board";
 import { type TodoStatus, type Todo } from "@prisma/client";
 
-export const todosGroupedByColumn = (todos: Todo[]): Columns => {
+export const todosGroupedByColumn = (
+  todos: Todo[],
+  first: number,
+  secod: number,
+  third: number
+): Columns => {
   const columns = todos.reduce((acc, todo) => {
     if (acc.get(todo.status) === undefined)
       acc.set(todo.status, {
@@ -13,9 +18,14 @@ export const todosGroupedByColumn = (todos: Todo[]): Columns => {
     return acc;
   }, new Map<TodoStatus, Column>());
 
-  const columsStatus: TodoStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+  const columnsStatus: TodoStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+  const columnsStatusSorted = [
+    columnsStatus[first],
+    columnsStatus[secod],
+    columnsStatus[third],
+  ] as TodoStatus[];
 
-  columsStatus.forEach((status: TodoStatus) => {
+  columnsStatusSorted.forEach((status: TodoStatus) => {
     if (columns.get(status) === undefined)
       columns.set(status, {
         id: status,
@@ -25,9 +35,20 @@ export const todosGroupedByColumn = (todos: Todo[]): Columns => {
 
   const sortedColumns = new Map(
     Array.from(columns.entries()).sort(
-      (a, b) => columsStatus.indexOf(a[0]) - columsStatus.indexOf(b[0])
+      (a, b) =>
+        columnsStatusSorted.indexOf(a[0]) - columnsStatusSorted.indexOf(b[0])
     )
   );
 
-  return sortedColumns;
+  const sortedTodos = new Map(
+    Array.from(sortedColumns.entries()).map(([key, value]) => [
+      key,
+      {
+        ...value,
+        todos: value.todos.sort((a, b) => a.index - b.index),
+      },
+    ])
+  );
+
+  return sortedTodos;
 };

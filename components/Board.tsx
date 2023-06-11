@@ -12,10 +12,16 @@ import { type Todo, type TodoStatus } from "@prisma/client";
 const Board: React.FC = () => {
   const { board, setBoard } = useBoardStore();
   const { data: todos, isLoading, isError, error } = api.todo.getAll.useQuery();
+
   useEffect(() => {
     if (todos) {
       setBoard({
-        columns: todosGroupedByColumn(todos),
+        columns: todosGroupedByColumn(
+          todos,
+          (todos[0]?.user.first ?? 0) as number,
+          (todos[0]?.user.second ?? 1) as number,
+          (todos[0]?.user.third ?? 2) as number
+        ),
       });
     }
   }, [setBoard, todos]);
@@ -33,11 +39,12 @@ const Board: React.FC = () => {
       const [removed] = entries.splice(source.index, 1);
       entries.splice(destination.index, 0, removed as [TodoStatus, Column]);
       const rearrangedColumns = new Map(entries);
-      setBoard({ columns: rearrangedColumns });
+      return setBoard({ columns: rearrangedColumns });
     }
 
     const columns = Array.from(board.columns);
     const startColIndex = columns[Number(source.droppableId)];
+
     const finishColIndex = columns[Number(destination.droppableId)];
 
     const startCol: Column = {
@@ -66,7 +73,7 @@ const Board: React.FC = () => {
       const newColumns = new Map(board.columns);
       newColumns.set(newCol.id, newCol);
 
-      setBoard({ columns: newColumns });
+      return setBoard({ columns: newColumns });
     } else {
       const finishTodos = Array.from(finishCol.todos);
       finishTodos.splice(destination.index, 0, todoMoved as Todo);
@@ -83,7 +90,7 @@ const Board: React.FC = () => {
         todos: finishTodos,
       });
 
-      setBoard({ columns: newColumns });
+      return setBoard({ columns: newColumns });
     }
   };
 

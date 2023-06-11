@@ -20,6 +20,9 @@ export const todoRouter = createTRPCRouter({
         userId: ctx.session.user.id,
         deletedAt: null,
       },
+      include: {
+        user: true,
+      },
     });
   }),
 
