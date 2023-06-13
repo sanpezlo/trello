@@ -18,9 +18,9 @@ const Board: React.FC = () => {
       setBoard({
         columns: todosGroupedByColumn(
           todos,
-          (todos[0]?.user.first ?? 0) as number,
-          (todos[0]?.user.second ?? 1) as number,
-          (todos[0]?.user.third ?? 2) as number
+          todos[0]?.user.first ?? 0,
+          todos[0]?.user.second ?? 1,
+          todos[0]?.user.third ?? 2
         ),
       });
     }

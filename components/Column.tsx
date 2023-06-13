@@ -4,6 +4,7 @@ import { StrictModeDroppable } from "@/components/StrictModeDroppable";
 import TodoCard from "@/components/TodoCard";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { useBoardStore } from "@/store/BoardStore";
+import { useModalStore } from "@/store/ModalStore";
 
 interface ColumnProps {
   id: TodoStatus;
@@ -19,6 +20,7 @@ const todoStatusToText: Record<TodoStatus, string> = {
 
 const Column: React.FC<ColumnProps> = ({ id, todos, index }) => {
   const { search } = useBoardStore();
+  const { openModal, setTaskType } = useModalStore();
 
   return (
     <Draggable draggableId={id} index={index}>
@@ -82,7 +84,13 @@ const Column: React.FC<ColumnProps> = ({ id, todos, index }) => {
 
                   <div className="flex items-end justify-end p-2">
                     <button className="text-green-500 transition hover:text-green-600">
-                      <PlusCircleIcon className="h-10 w-10 " />
+                      <PlusCircleIcon
+                        className="h-10 w-10 "
+                        onClick={() => {
+                          setTaskType(id);
+                          openModal();
+                        }}
+                      />
                     </button>
                   </div>
                 </div>
