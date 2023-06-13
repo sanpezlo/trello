@@ -3,8 +3,11 @@ import Image from "next/image";
 import { MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Menu, Transition } from "@headlessui/react";
+import { useBoardStore } from "@/store/BoardStore";
 
 const Header: React.FC = () => {
+  const { search, setSearch } = useBoardStore();
+
   return (
     <header className="flex flex-col items-center rounded-b-2xl bg-gray-500/10 p-5 md:flex-row">
       <Image
@@ -21,6 +24,8 @@ const Header: React.FC = () => {
             type="text"
             placeholder="Search"
             className="w-full flex-1 border-none p-2 font-normal text-gray-500 outline-none focus:border-none focus:ring-0"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <button type="submit" hidden>
             Search
