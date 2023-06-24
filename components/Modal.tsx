@@ -4,6 +4,7 @@ import { useModalStore } from "@/store/ModalStore";
 import TaskTypeRadioGroup from "@/components/TaskTypeRadioGroup";
 import Image from "next/image";
 import { PhotoIcon } from "@heroicons/react/24/solid";
+import { api } from "@/utils/api";
 
 const Modal: React.FC = () => {
   const imagePickerRef = useRef<HTMLInputElement>(null);
@@ -12,18 +13,52 @@ const Modal: React.FC = () => {
     isOpen,
     closeModal,
     taskTitle,
+    taskType,
     setTaskTitle,
     taskImage,
     setTaskImage,
     clearTask,
   } = useModalStore();
 
+  const todoMutation = api.todo.create.useMutation();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!taskTitle) return;
 
-    clearTask();
-    closeModal();
+    void (async () => {
+      let secure_url = undefined;
+
+      if (taskImage) {
+        const formData = new FormData();
+
+        formData.append("file", taskImage as Blob);
+
+        formData.append("upload_preset", "my-uploads");
+
+        const request = await fetch(
+          "https://api.cloudinary.com/v1_1/dto7he7xr/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (request.status !== 200) return;
+
+        const data = (await request.json()) as { secure_url: string };
+        secure_url = data.secure_url;
+      }
+
+      const todo = await todoMutation.mutateAsync({
+        title: taskTitle,
+        status: taskType,
+        image: secure_url,
+      });
+
+      clearTask();
+      closeModal();
+    })();
   };
 
   return (
@@ -95,6 +130,7 @@ const Modal: React.FC = () => {
                   )}
                   <input
                     type="file"
+                    name="file"
                     ref={imagePickerRef}
                     hidden
                     onChange={(e) => {

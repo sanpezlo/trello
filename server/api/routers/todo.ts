@@ -1,19 +1,7 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  protectedProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 export const todoRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.todo.findMany({
       where: {
@@ -23,10 +11,39 @@ export const todoRouter = createTRPCRouter({
       include: {
         user: true,
       },
+      orderBy: {
+        index: "asc",
+      },
     });
   }),
 
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
+  create: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1),
+        status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
+        image: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const todos = await ctx.prisma.todo.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          deletedAt: null,
+          status: input.status,
+        },
+      });
+
+      const index = todos.length;
+
+      return ctx.prisma.todo.create({
+        data: {
+          title: input.title,
+          index: index,
+          status: input.status,
+          image: input.image,
+          userId: ctx.session.user.id,
+        },
+      });
+    }),
 });

@@ -69,8 +69,6 @@ const Column: React.FC<ColumnProps> = ({ id, todos, index }) => {
                         {(provided) => (
                           <TodoCard
                             todo={todo}
-                            index={index}
-                            id={id}
                             innerRef={provided.innerRef}
                             draggableProps={provided.draggableProps}
                             dragHandleProps={provided.dragHandleProps}

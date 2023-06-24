@@ -7,8 +7,6 @@ import {
 
 interface TodoCardProps {
   todo: Todo;
-  index: number;
-  id: TodoStatus;
   innerRef: (element: HTMLElement | null) => void;
   draggableProps: DraggableProvidedDraggableProps;
   dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
@@ -16,8 +14,6 @@ interface TodoCardProps {
 
 const TodoCard: React.FC<TodoCardProps> = ({
   todo,
-  index,
-  id,
   innerRef,
   draggableProps,
   dragHandleProps,
