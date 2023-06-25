@@ -1,9 +1,10 @@
 import { XCircleIcon } from "@heroicons/react/24/solid";
-import { type Todo, type TodoStatus } from "@prisma/client";
+import { type Todo } from "@prisma/client";
 import {
   type DraggableProvidedDragHandleProps,
   type DraggableProvidedDraggableProps,
 } from "react-beautiful-dnd";
+import { api } from "@/utils/api";
 
 interface TodoCardProps {
   todo: Todo;
@@ -18,6 +19,12 @@ const TodoCard: React.FC<TodoCardProps> = ({
   draggableProps,
   dragHandleProps,
 }) => {
+  const todoDeleteMutation = api.todo.deleteSave.useMutation();
+
+  const handleClick = () => {
+    void todoDeleteMutation.mutateAsync({ id: todo.id });
+  };
+
   return (
     <div
       className="space-y-2 rounded-md bg-white drop-shadow-md"
@@ -27,7 +34,10 @@ const TodoCard: React.FC<TodoCardProps> = ({
     >
       <div className="flex items-center justify-between p-5">
         <p>{todo.title}</p>
-        <button className="text-red-500 transition hover:text-red-600">
+        <button
+          className="text-red-500 transition hover:text-red-600"
+          onClick={handleClick}
+        >
           <XCircleIcon className="ml-5 h-8 w-8" />
         </button>
       </div>
