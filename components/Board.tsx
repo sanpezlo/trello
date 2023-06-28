@@ -12,6 +12,7 @@ import { type Todo, type TodoStatus } from "@prisma/client";
 const Board: React.FC = () => {
   const { board, setBoard } = useBoardStore();
   const { data: todos, isLoading, isError, error } = api.todo.getAll.useQuery();
+  const todoUpdateIndexMutation = api.todo.updateIndex.useMutation();
 
   useEffect(() => {
     if (todos) {
@@ -73,7 +74,14 @@ const Board: React.FC = () => {
       const newColumns = new Map(board.columns);
       newColumns.set(newCol.id, newCol);
 
-      return setBoard({ columns: newColumns });
+      setBoard({ columns: newColumns });
+
+      todoUpdateIndexMutation.mutate({
+        id: todoMoved?.id as string,
+        index: destination.index,
+      });
+
+      return;
     } else {
       const finishTodos = Array.from(finishCol.todos);
       finishTodos.splice(destination.index, 0, todoMoved as Todo);
@@ -118,6 +126,8 @@ const Board: React.FC = () => {
                   />
                 )
               )}
+
+              {provided.placeholder}
             </div>
           )}
         </StrictModeDroppable>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const todoRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -60,6 +61,90 @@ export const todoRouter = createTRPCRouter({
         },
         data: {
           deletedAt: new Date(),
+        },
+      });
+    }),
+
+  updateIndex: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        index: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const todo = await ctx.prisma.todo.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!todo)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Todo not found" });
+
+      if (todo.index === input.index) return todo;
+
+      if (todo.index > input.index) {
+        const todos = await ctx.prisma.todo.findMany({
+          where: {
+            userId: ctx.session.user.id,
+            deletedAt: null,
+            status: todo.status,
+            index: {
+              gte: input.index,
+              lt: todo.index,
+            },
+          },
+        });
+
+        await Promise.all(
+          todos.map(async (todo) => {
+            return await ctx.prisma.todo.update({
+              where: {
+                id: todo.id,
+              },
+              data: {
+                index: todo.index + 1,
+              },
+            });
+          })
+        );
+      } else {
+        const todos = await ctx.prisma.todo.findMany({
+          where: {
+            id: {
+              not: todo.id,
+            },
+            userId: ctx.session.user.id,
+            deletedAt: null,
+            status: todo.status,
+            index: {
+              lte: input.index,
+              gt: todo.index,
+            },
+          },
+        });
+
+        await Promise.all(
+          todos.map(async (todo) => {
+            return await ctx.prisma.todo.update({
+              where: {
+                id: todo.id,
+              },
+              data: {
+                index: todo.index - 1,
+              },
+            });
+          })
+        );
+      }
+
+      return await ctx.prisma.todo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          index: input.index,
         },
       });
     }),
