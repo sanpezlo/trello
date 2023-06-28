@@ -5,6 +5,7 @@ import {
   type DraggableProvidedDraggableProps,
 } from "react-beautiful-dnd";
 import { api } from "@/utils/api";
+import { useBoardStore } from "@/store/BoardStore";
 
 interface TodoCardProps {
   todo: Todo;
@@ -19,10 +20,30 @@ const TodoCard: React.FC<TodoCardProps> = ({
   draggableProps,
   dragHandleProps,
 }) => {
+  const { board, setBoard } = useBoardStore();
+
   const todoDeleteMutation = api.todo.deleteSave.useMutation();
 
   const handleClick = () => {
     void todoDeleteMutation.mutateAsync({ id: todo.id });
+
+    setBoard({
+      columns: new Map(
+        Array.from(board.columns, ([key, value]) => {
+          if (key === todo.status) {
+            return [
+              key,
+              {
+                ...value,
+                todos: value.todos.filter((t) => t.id !== todo.id),
+              },
+            ];
+          }
+
+          return [key, value];
+        })
+      ),
+    });
   };
 
   return (

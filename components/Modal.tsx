@@ -5,9 +5,12 @@ import TaskTypeRadioGroup from "@/components/TaskTypeRadioGroup";
 import Image from "next/image";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { api } from "@/utils/api";
+import { useBoardStore } from "@/store/BoardStore";
 
 const Modal: React.FC = () => {
   const imagePickerRef = useRef<HTMLInputElement>(null);
+
+  const { board, setBoard } = useBoardStore();
 
   const {
     isOpen,
@@ -54,6 +57,24 @@ const Modal: React.FC = () => {
         title: taskTitle,
         status: taskType,
         image: secure_url,
+      });
+
+      setBoard({
+        columns: new Map(
+          Array.from(board.columns, ([key, value]) => {
+            if (key === taskType) {
+              return [
+                key,
+                {
+                  ...value,
+                  todos: [...value.todos, todo],
+                },
+              ];
+            }
+
+            return [key, value];
+          })
+        ),
       });
 
       clearTask();
