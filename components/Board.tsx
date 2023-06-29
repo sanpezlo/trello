@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { DragDropContext, type DropResult } from "react-beautiful-dnd";
 
 import { useBoardStore } from "@/store/BoardStore";
-import { todosGroupedByColumn } from "@/utils/todos";
+import { columnsStatus, todosGroupedByColumn } from "@/utils/todos";
 import ColumnComponent from "@/components/Column";
 import { StrictModeDroppable } from "@/components/StrictModeDroppable";
 import { type Column } from "@/types/Board";
@@ -12,6 +12,8 @@ import { type Todo, type TodoStatus } from "@prisma/client";
 const Board: React.FC = () => {
   const { board, setBoard } = useBoardStore();
   const { data: todos, isLoading, isError, error } = api.todo.getAll.useQuery();
+  const userUpdateColumnPreferencesMutation =
+    api.user.updateColumnPreferences.useMutation();
   const todoUpdateIndexMutation = api.todo.updateIndex.useMutation();
 
   useEffect(() => {
@@ -40,7 +42,14 @@ const Board: React.FC = () => {
       const [removed] = entries.splice(source.index, 1);
       entries.splice(destination.index, 0, removed as [TodoStatus, Column]);
       const rearrangedColumns = new Map(entries);
-      return setBoard({ columns: rearrangedColumns });
+      setBoard({ columns: rearrangedColumns });
+
+      userUpdateColumnPreferencesMutation.mutate({
+        id: (removed as [TodoStatus, Column])[0],
+        index: destination.index,
+      });
+
+      return;
     }
 
     const columns = Array.from(board.columns);

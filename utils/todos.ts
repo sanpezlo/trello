@@ -1,6 +1,8 @@
 import { type Columns, type Column } from "@/types/Board";
 import { type TodoStatus, type Todo } from "@prisma/client";
 
+export const columnsStatus: TodoStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+
 export const todosGroupedByColumn = (
   todos: Todo[],
   first: number,
@@ -18,7 +20,6 @@ export const todosGroupedByColumn = (
     return acc;
   }, new Map<TodoStatus, Column>());
 
-  const columnsStatus: TodoStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
   const columnsStatusSorted = [
     columnsStatus[first],
     columnsStatus[secod],
