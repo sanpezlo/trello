@@ -15,6 +15,7 @@ const Board: React.FC = () => {
   const userUpdateColumnPreferencesMutation =
     api.user.updateColumnPreferences.useMutation();
   const todoUpdateIndexMutation = api.todo.updateIndex.useMutation();
+  const todoUpdateStatusMutation = api.todo.updateStatus.useMutation();
 
   useEffect(() => {
     if (todos) {
@@ -94,6 +95,7 @@ const Board: React.FC = () => {
     } else {
       const finishTodos = Array.from(finishCol.todos);
       finishTodos.splice(destination.index, 0, todoMoved as Todo);
+      console.log(todoMoved, finishCol.id, destination.index);
 
       const newColumns = new Map(board.columns);
       const newCol: Column = {
@@ -107,7 +109,15 @@ const Board: React.FC = () => {
         todos: finishTodos,
       });
 
-      return setBoard({ columns: newColumns });
+      setBoard({ columns: newColumns });
+
+      todoUpdateStatusMutation.mutate({
+        id: todoMoved?.id as string,
+        status: finishCol.id,
+        index: destination.index,
+      });
+
+      return;
     }
   };
 
