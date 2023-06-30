@@ -6,6 +6,7 @@ import {
 } from "react-beautiful-dnd";
 import { api } from "@/utils/api";
 import { useBoardStore } from "@/store/BoardStore";
+import Image from "next/image";
 
 interface TodoCardProps {
   todo: Todo;
@@ -62,6 +63,18 @@ const TodoCard: React.FC<TodoCardProps> = ({
           <XCircleIcon className="ml-5 h-8 w-8" />
         </button>
       </div>
+
+      {todo.image && (
+        <div className="relative h-full w-full rounded-b-md">
+          <Image
+            src={todo.image}
+            alt="Task image"
+            width={400}
+            height={200}
+            className="w-full rounded-b-md object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 };
