@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { DragDropContext, type DropResult } from "react-beautiful-dnd";
 
 import { useBoardStore } from "@/store/BoardStore";
-import { columnsStatus, todosGroupedByColumn } from "@/utils/todos";
+import { todosGroupedByColumn } from "@/utils/todos";
 import ColumnComponent from "@/components/Column";
 import { StrictModeDroppable } from "@/components/StrictModeDroppable";
 import { type Column } from "@/types/Board";
@@ -30,7 +30,7 @@ const Board: React.FC = () => {
     }
   }, [setBoard, todos]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <BoardSkeleton />;
   if (isError) return <div>{JSON.stringify(error)}</div>;
 
   const handleOnDragEnd = (result: DropResult) => {
@@ -95,7 +95,6 @@ const Board: React.FC = () => {
     } else {
       const finishTodos = Array.from(finishCol.todos);
       finishTodos.splice(destination.index, 0, todoMoved as Todo);
-      console.log(todoMoved, finishCol.id, destination.index);
 
       const newColumns = new Map(board.columns);
       const newCol: Column = {
@@ -151,6 +150,79 @@ const Board: React.FC = () => {
           )}
         </StrictModeDroppable>
       </DragDropContext>
+    </main>
+  );
+};
+
+const BoardSkeleton: React.FC = () => {
+  return (
+    <main className="mt-5 h-full max-h-full overflow-auto">
+      <div className="mx-5 grid max-w-7xl animate-pulse grid-cols-1 gap-5 md:mx-auto md:grid-cols-3">
+        <div>
+          <div className="rounded-2xl bg-white/50 p-2 shadow-sm">
+            <h2 className="flex justify-between p-2 text-xl font-bold">
+              &nbsp;
+              <span className="h-7 w-8 rounded-full bg-gray-200 px-2 py-1 text-sm font-normal text-gray-500"></span>
+            </h2>
+            <div className="space-y-2">
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+
+              <div className="p-7"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="rounded-2xl bg-white/50 p-2 shadow-sm">
+            <h2 className="flex justify-between p-2 text-xl font-bold">
+              &nbsp;
+              <span className="h-7 w-8 rounded-full bg-gray-200 px-2 py-1 text-sm font-normal text-gray-500"></span>
+            </h2>
+            <div className="space-y-2">
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+              <div className="p-7"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="rounded-2xl bg-white/50 p-2 shadow-sm">
+            <h2 className="flex justify-between p-2 text-xl font-bold">
+              &nbsp;
+              <span className="h-7 w-8 rounded-full bg-gray-200 px-2 py-1 text-sm font-normal text-gray-500"></span>
+            </h2>
+            <div className="space-y-2">
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+              <div className="space-y-2 rounded-md bg-white drop-shadow-md">
+                <div className="flex items-center justify-between p-5">
+                  <p>&nbsp;</p>
+                </div>
+              </div>
+              <div className="p-7"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };
